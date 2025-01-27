@@ -1,5 +1,28 @@
 const BASE_URL = 'https://playground.4geeks.com/todo';
 
+// Crear un nuevo usuario
+export const createUser = async (username) => {
+  try {
+    const response = await fetch(`${BASE_URL}/users/${username}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({"name": username}), // Enviar el nombre del usuario
+    });
+
+    if (!response.ok) {
+      throw new Error('No se pudo crear el usuario');
+    }
+
+    const data = await response.json();
+    return data; // Devuelve los datos del usuario creado
+  } catch (error) {
+    console.error('Error al crear usuario:', error);
+  }
+};
+
+
 // Crear un nuevo todo para un usuario existente con una tarea
 export const createTodoForUser = async (userId, task) => {
   try {

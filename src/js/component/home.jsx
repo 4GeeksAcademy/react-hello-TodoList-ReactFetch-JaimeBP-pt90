@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createTodoForUser, updateTasks, deleteTask } from './api';
+import { createUser, createTodoForUser, updateTasks, deleteTask } from './api';
 import "../../styles/index.css";
 
 const Home = () => {
@@ -8,23 +8,31 @@ const Home = () => {
   const [userId, setUserId] = useState(null);
   const username = 'Jaime'; // Nombre del usuario siempre es Jaime
 
-  // Obtener el ID de Jaime cuando se carga la página
   useEffect(() => {
-    const fetchUserId = async () => {
+    const fetchOrCreateUser = async () => {
       try {
-        const response = await fetch('https://playground.4geeks.com/todo/users');
+        const response = await fetch(`https://playground.4geeks.com/todo/users`);
         const data = await response.json();
-        const user = data.users.find(user => user.name === username);
+        const user = data.users.find((user) => user.name === username);
+  
         if (user) {
-          setUserId(user.id); // Establecer el ID de Jaime
+          // Si el usuario ya existe, establece el ID en el estado
+          setUserId(user.id);
+        } else {
+          // Si el usuario no existe, créalo
+          const newUser = await createUser(username); // Llama a la función que creamos en api.js
+          if (newUser) {
+            setUserId(newUser.id); // Establece el ID del nuevo usuario
+          }
         }
       } catch (error) {
-        console.error('Error al obtener el ID del usuario:', error);
+        console.error('Error al obtener o crear el usuario:', error);
       }
     };
-
-    fetchUserId();
+  
+    fetchOrCreateUser();
   }, []);
+  
 
   // Manejar la adición de tareas
   const handleAddTask = async (event) => {
